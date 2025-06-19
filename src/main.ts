@@ -1,4 +1,6 @@
-import { Client, GatewayIntentBits, Message, TextChannel } from 'discord.js'
+import { Client, GatewayIntentBits } from 'discord.js'
+
+import * as pingCommand from './commands/ping'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -22,12 +24,14 @@ client.once('ready', () => {
     }
 })
 
-client.on('messageCreate', async (message: Message) => {
-    if (message.author.bot) return
-    if (message.content.startsWith('!ping')) {
-        if (message.channel instanceof TextChannel) {
-            await message.channel.send('Pong!')
-        }
+// ...existing code...
+
+// ...コマンド登録処理...
+
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isChatInputCommand()) return
+    if (interaction.commandName === 'ping') {
+        await pingCommand.execute(interaction)
     }
 })
 

@@ -46,7 +46,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
-const pingCommand = __importStar(require("./commands/ping"));
+const pingCommand = __importStar(require("./commands/ping.js"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const client = new discord_js_1.Client({
@@ -67,6 +67,7 @@ client.once('ready', () => {
     }
 });
 // ...existing code...
+const commands = [pingCommand.data.toJSON()];
 // ...コマンド登録処理...
 client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0, function* () {
     if (!interaction.isChatInputCommand())
