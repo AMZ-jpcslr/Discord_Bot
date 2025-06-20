@@ -24,10 +24,10 @@ client.once('ready', () => {
     }
 })
 
-// ...existing code...
 
 // ...コマンド登録処理...
 
+//pingコマンドの登録
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return
     if (interaction.commandName === 'ping') {
