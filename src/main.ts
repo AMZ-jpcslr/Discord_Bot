@@ -15,7 +15,7 @@ const client = new Client({
 function setBotPresence() {
     if (client.user) {
         client.user.setPresence({
-            activities: [{ name: 'キヴォトスの最新情報を', type: 1 }],
+            activities: [{ name: 'キヴォトスの最新情報', type: 1 }],
             status: 'online',
         })
     }
