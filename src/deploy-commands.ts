@@ -1,17 +1,13 @@
-import { REST, Routes, SlashCommandBuilder } from 'discord.js'
+import { REST, Routes } from 'discord.js'
 import dotenv from 'dotenv'
+import { data as pingData } from './commands/ping'
+import { data as lotteryData } from './commands/lottery'
 
 dotenv.config()
 
 const commands = [
-    new SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Botの応答速度を測定します。')
-        .toJSON(),
-    new SlashCommandBuilder()
-        .setName('lottery')
-        .setDescription('ランダムな抽選を行います。')
-        .toJSON(),
+    pingData.toJSON(),
+    lotteryData.toJSON(),
 ]
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN as string)
