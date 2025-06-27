@@ -8,6 +8,10 @@ const commands = [
         .setName('ping')
         .setDescription('Botの応答速度を測定します。')
         .toJSON(),
+    new SlashCommandBuilder()
+        .setName('lottery')
+        .setDescription('ランダムな抽選を行います。')
+        .toJSON(),
 ]
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN as string)
