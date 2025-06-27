@@ -53,7 +53,7 @@ const client = new discord_js_1.Client({
     intents: [
         discord_js_1.GatewayIntentBits.Guilds,
         discord_js_1.GatewayIntentBits.GuildMessages,
-        discord_js_1.GatewayIntentBits.MessageContent, // これがないとメッセージ内容が取得できません
+        discord_js_1.GatewayIntentBits.MessageContent,
     ],
 });
 function setBotPresence() {
