@@ -59,7 +59,7 @@ const client = new discord_js_1.Client({
 function setBotPresence() {
     if (client.user) {
         client.user.setPresence({
-            activities: [{ name: 'キヴォトスで業務中' }],
+            activities: [{ name: 'キヴォトスの最新情報を', type: 1 }],
             status: 'online',
         });
     }
