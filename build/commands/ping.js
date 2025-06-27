@@ -14,9 +14,10 @@ exports.execute = execute;
 const discord_js_1 = require("discord.js");
 exports.data = new discord_js_1.SlashCommandBuilder()
     .setName('ping')
-    .setDescription('Pong!と返します');
+    .setDescription('BotのPing値を返します');
 function execute(interaction) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield interaction.reply('Pong!');
+        const ping = interaction.client.ws.ping;
+        yield interaction.reply(`現在のPing値: ${ping}ms`);
     });
 }
