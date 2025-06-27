@@ -1,5 +1,6 @@
 import { Client, GatewayIntentBits } from 'discord.js'
 import * as pingCommand from './commands/ping'
+import * as lotteryCommand from './commands/lottery' // ←追加
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -42,11 +43,14 @@ client.on('shardResume', () => {
 })
 
 
-//pingコマンドの登録
+//コマンドの登録
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return
     if (interaction.commandName === 'ping') {
         await pingCommand.execute(interaction)
+    }
+    if (interaction.commandName === 'lottery') { // ←追加
+        await lotteryCommand.execute(interaction)
     }
 })
 

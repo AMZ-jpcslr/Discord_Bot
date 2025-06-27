@@ -47,6 +47,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const pingCommand = __importStar(require("./commands/ping"));
+const lotteryCommand = __importStar(require("./commands/lottery")); // ←追加
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const client = new discord_js_1.Client({
@@ -81,12 +82,15 @@ client.once('ready', () => {
 client.on('shardResume', () => {
     setBotPresence();
 });
-//pingコマンドの登録
+//コマンドの登録
 client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0, function* () {
     if (!interaction.isChatInputCommand())
         return;
     if (interaction.commandName === 'ping') {
         yield pingCommand.execute(interaction);
+    }
+    if (interaction.commandName === 'lottery') { // ←追加
+        yield lotteryCommand.execute(interaction);
     }
 }));
 client.login(process.env.TOKEN);
