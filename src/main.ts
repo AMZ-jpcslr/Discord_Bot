@@ -1,5 +1,4 @@
 import { Client, GatewayIntentBits } from 'discord.js'
-
 import * as pingCommand from './commands/ping'
 import dotenv from 'dotenv'
 
@@ -9,23 +8,39 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent, // これがないとメッセージ内容が取得できません
+        GatewayIntentBits.MessageContent, 
     ],
 })
 
-client.once('ready', () => {
-    console.log('Ready!')
+function setBotPresence() {
     if (client.user) {
-        console.log(client.user.tag)
         client.user.setPresence({
             activities: [{ name: 'キヴォトスで業務中' }],
             status: 'online',
         })
     }
+}
+
+client.once('ready', () => {
+    console.log('Ready!')
+    if (client.user) {
+        console.log(client.user.tag)
+    }
+    setBotPresence()
+
+    // 5分ごとにPing値とサーバー数をターミナルに出力
+    setInterval(() => {
+        const ping = client.ws.ping
+        const guildCount = client.guilds.cache.size
+        console.log(`Bot起動中！Ping: ${ping}ms / サーバー数: ${guildCount}`)
+    }, 5 * 60 * 1000) // 5分ごと（ミリ秒に修正）
 })
 
+// 再接続時にもステータスを再設定
+client.on('shardResume', () => {
+    setBotPresence()
+})
 
-// ...コマンド登録処理...
 
 //pingコマンドの登録
 client.on('interactionCreate', async (interaction) => {
