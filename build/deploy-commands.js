@@ -14,16 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const dotenv_1 = __importDefault(require("dotenv"));
+const ping_1 = require("./commands/ping");
+const lottery_1 = require("./commands/lottery");
 dotenv_1.default.config();
 const commands = [
-    new discord_js_1.SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Botの応答速度を測定します。')
-        .toJSON(),
-    new discord_js_1.SlashCommandBuilder()
-        .setName('lottery')
-        .setDescription('ランダムな抽選を行います。')
-        .toJSON(),
+    ping_1.data.toJSON(),
+    lottery_1.data.toJSON(),
 ];
 const rest = new discord_js_1.REST({ version: '10' }).setToken(process.env.TOKEN);
 function main() {
