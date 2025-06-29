@@ -160,7 +160,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         }
         // 英語表記の曜日に変更
         const weekLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-        const cellWidth = 3; // [07] で3文字
+        const cellWidth = 4; // [07] で3文字
         const padCell = (s: string) => s.padEnd(cellWidth, ' ');
         const weeks = getMonthCalendar(year, month)
         // ヘッダー
@@ -208,7 +208,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         }
         if (!details) details = 'この月に登録されたシフトはありません。';
         const embed = new EmbedBuilder()
-            .setTitle(`${interaction.user.username}'s Shift Details for ${year}/${month}`)
+            .setTitle(`${interaction.user.username}の ${year}/${month} のシフト詳細`)
             .setDescription('```' + details + '```')
             .setColor(0x00bfff)
         await interaction.reply({ embeds: [embed] })
