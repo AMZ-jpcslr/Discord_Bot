@@ -2,12 +2,14 @@ import { REST, Routes } from 'discord.js'
 import dotenv from 'dotenv'
 import { data as pingData } from './commands/ping'
 import { data as lotteryData } from './commands/lottery'
+import { data as shiftData } from './commands/shift'
 
 dotenv.config()
 
 const commands = [
     pingData.toJSON(),
     lotteryData.toJSON(),
+    shiftData.toJSON(), // ←追加
 ]
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN as string)

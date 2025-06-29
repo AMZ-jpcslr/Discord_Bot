@@ -48,6 +48,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const pingCommand = __importStar(require("./commands/ping"));
 const lotteryCommand = __importStar(require("./commands/lottery")); // ←追加
+const shiftCommand = __importStar(require("./commands/shift"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const client = new discord_js_1.Client({
@@ -89,8 +90,11 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
     if (interaction.commandName === 'ping') {
         yield pingCommand.execute(interaction);
     }
-    if (interaction.commandName === 'lottery') { // ←追加
+    if (interaction.commandName === 'lottery') {
         yield lotteryCommand.execute(interaction);
+    }
+    if (interaction.commandName === 'shift') {
+        yield shiftCommand.execute(interaction);
     }
 }));
 client.login(process.env.TOKEN);

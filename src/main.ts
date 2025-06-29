@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits } from 'discord.js'
 import * as pingCommand from './commands/ping'
 import * as lotteryCommand from './commands/lottery' // ←追加
+import * as shiftCommand from './commands/shift'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -49,8 +50,11 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.commandName === 'ping') {
         await pingCommand.execute(interaction)
     }
-    if (interaction.commandName === 'lottery') { // ←追加
+    if (interaction.commandName === 'lottery') {
         await lotteryCommand.execute(interaction)
+    }
+    if (interaction.commandName === 'shift') {
+        await shiftCommand.execute(interaction)
     }
 })
 
