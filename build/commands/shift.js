@@ -44,7 +44,17 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDescription('終了時刻 (例: 18:00)')
     .setRequired(true)))
     .addSubcommand(sub => sub.setName('show')
-    .setDescription('今週のシフトをカレンダー形式で表示'))
+    .setDescription('指定した月のシフトをカレンダー形式で表示')
+    .addIntegerOption(opt => opt.setName('year')
+    .setDescription('年 (例: 2025)')
+    .setRequired(true)
+    .setMinValue(2000)
+    .setMaxValue(2100))
+    .addIntegerOption(opt => opt.setName('month')
+    .setDescription('月 (1-12)')
+    .setRequired(true)
+    .setMinValue(1)
+    .setMaxValue(12)))
     .addSubcommand(sub => sub.setName('delete')
     .setDescription('指定した日付のシフトを削除')
     .addStringOption(opt => opt.setName('date')
@@ -65,18 +75,29 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .addStringOption(opt => opt.setName('end')
     .setDescription('新しい終了時刻 (例: 19:00)')
     .setRequired(true)));
-function getWeekDates(baseDate) {
-    // baseDateを含む週の日曜～土曜の日付配列を返す
-    const day = baseDate.getDay();
-    const sunday = new Date(baseDate);
-    sunday.setDate(baseDate.getDate() - day);
-    const week = [];
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(sunday);
-        d.setDate(sunday.getDate() + i);
-        week.push(d.toISOString().slice(0, 10));
+function getMonthCalendar(year, month) {
+    // 1日から月末までの日付を週ごとに2次元配列で返す
+    const weeks = [];
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    let week = [];
+    // 1日目の曜日まで空欄
+    for (let i = 0; i < firstDay.getDay(); i++)
+        week.push('');
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+        week.push(String(d));
+        if (week.length === 7) {
+            weeks.push(week);
+            week = [];
+        }
     }
-    return week;
+    // 最終週の残りを空欄で埋める
+    if (week.length > 0) {
+        while (week.length < 7)
+            week.push('');
+        weeks.push(week);
+    }
+    return weeks;
 }
 function execute(interaction) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -102,24 +123,39 @@ function execute(interaction) {
             yield interaction.reply(`✅ ${date} のシフト「${start} - ${end}」を登録しました。`);
         }
         else if (sub === 'show') {
+            // 年月取得
+            const year = interaction.options.getInteger('year', true);
+            const month = interaction.options.getInteger('month', true);
             const userShifts = shifts[userId];
             if (!userShifts || Object.keys(userShifts).length === 0) {
                 yield interaction.reply('登録されたシフトがありません。');
                 return;
             }
-            const now = new Date();
-            const weekDates = getWeekDates(now);
+            const weeks = getMonthCalendar(year, month);
             const weekLabels = ['日', '月', '火', '水', '木', '金', '土'];
-            let calendar = '| ' + weekLabels.join(' | ') + ' |\n|:--:|:--:|:--:|:--:|:--:|:--:|:--:|\n|';
-            for (let i = 0; i < 7; i++) {
-                const date = weekDates[i];
-                calendar += userShifts[date] ? ` ${userShifts[date]} ` : ' - ';
-                calendar += ' |';
+            // 幅を揃える
+            const cellWidth = 12;
+            const pad = (s) => s.padEnd(cellWidth, ' ');
+            // ヘッダー
+            let calendar = '| ' + weekLabels.map(w => pad(w)).join(' | ') + ' |\n';
+            calendar += '|' + weekLabels.map(() => ':--:'.padEnd(cellWidth + 1, '-')).join('|') + '|\n';
+            // 各週
+            for (const week of weeks) {
+                calendar += '|';
+                for (let i = 0; i < 7; i++) {
+                    const day = week[i];
+                    let cell = '';
+                    if (day) {
+                        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        cell = userShifts[dateStr] ? `${day} ${userShifts[dateStr]}` : day;
+                    }
+                    calendar += ' ' + pad(cell) + ' |';
+                }
+                calendar += '\n';
             }
             const embed = new discord_js_1.EmbedBuilder()
-                .setTitle(`${interaction.user.username}さんの今週のシフト`)
-                .setDescription(calendar)
-                .setFooter({ text: `週: ${weekDates[0]} ～ ${weekDates[6]}` })
+                .setTitle(`${interaction.user.username}さんの${year}年${month}月のシフト`)
+                .setDescription('```markdown\n' + calendar + '```')
                 .setColor(0x00bfff);
             yield interaction.reply({ embeds: [embed] });
         }
