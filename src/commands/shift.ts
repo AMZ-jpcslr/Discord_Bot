@@ -87,6 +87,24 @@ export const data = new SlashCommandBuilder()
                     .setRequired(true)
             )
     )
+    .addSubcommand(sub =>
+        sub.setName('show_detail')
+            .setDescription('指定した月のシフト詳細を一覧表示')
+            .addIntegerOption(opt =>
+                opt.setName('year')
+                    .setDescription('年 (例: 2025)')
+                    .setRequired(true)
+                    .setMinValue(2000)
+                    .setMaxValue(2100)
+            )
+            .addIntegerOption(opt =>
+                opt.setName('month')
+                    .setDescription('月 (1-12)')
+                    .setRequired(true)
+                    .setMinValue(1)
+                    .setMaxValue(12)
+            )
+    )
 
 function getMonthCalendar(year: number, month: number): string[][] {
     // 1日から月末までの日付を週ごとに2次元配列で返す
@@ -142,11 +160,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         }
         // 英語表記の曜日に変更
         const weekLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-        const cellWidth = 4; // [07] で4文字
+        const cellWidth = 3; // [07] で3文字
         const padCell = (s: string) => s.padEnd(cellWidth, ' ');
         const weeks = getMonthCalendar(year, month)
         // ヘッダー
-        let calendar = '| ' + weekLabels.map(w => padCell(w)).join(' | ') + ' |\n'
+        let calendar = '|'+weekLabels.map(w => padCell(w)).join('|')+'|\n'
         calendar += '|' + weekLabels.map(() => '-'.repeat(cellWidth)).join('|') + '|\n'
         // 各週
         for (const week of weeks) {
@@ -159,7 +177,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                     // シフトがある日は角括弧で囲む
                     cell = userShifts[dateStr]
                         ? `[${day.toString().padStart(2, '0')}]`
-                        : ` ${day.toString().padStart(2, '0')} `;
+                        : `${day.toString().padStart(2, '0')}`;
                 } else {
                     cell = ' '.repeat(cellWidth);
                 }
@@ -169,7 +187,29 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         }
         const embed = new EmbedBuilder()
             .setTitle(`${interaction.user.username}'s Shift for ${year}/${month}`)
-            .setDescription('```' + calendar + '```\n🔴: Shift exists\nUse `/shift show_detail` for details.')
+            .setDescription('```' + calendar + '```\n[date]: シフトが登録されています\n`/shift show_detail` コマンドで詳細を表示できます。')
+            .setColor(0x00bfff)
+        await interaction.reply({ embeds: [embed] })
+    } else if (sub === 'show_detail') {
+        // シフト詳細表示
+        const year = interaction.options.getInteger('year', true)
+        const month = interaction.options.getInteger('month', true)
+        const userShifts = shifts[userId]
+        if (!userShifts || Object.keys(userShifts).length === 0) {
+            await interaction.reply('登録されたシフトがありません。')
+            return
+        }
+        let details = '';
+        for (let d = 1; d <= 31; d++) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            if (userShifts[dateStr]) {
+                details += `${dateStr}: ${userShifts[dateStr]}\n`;
+            }
+        }
+        if (!details) details = 'この月に登録されたシフトはありません。';
+        const embed = new EmbedBuilder()
+            .setTitle(`${interaction.user.username}'s Shift Details for ${year}/${month}`)
+            .setDescription('```' + details + '```')
             .setColor(0x00bfff)
         await interaction.reply({ embeds: [embed] })
     } else if (sub === 'delete') {
