@@ -26,6 +26,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         const maxScale = detail.Body?.Intensity?.Observation?.MaxInt ?? '不明'
         const hypocenterObj = detail.Body?.Earthquake?.Hypocenter;
         console.log('Hypocenter:', hypocenterObj);
+        console.log('jmaImageUrl:', jmaImageUrl);
 
         const embed = new EmbedBuilder()
             .setTitle('直近の地震情報（気象庁）')

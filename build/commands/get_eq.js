@@ -37,6 +37,7 @@ function execute(interaction) {
             const maxScale = (_p = (_o = (_m = (_l = detail.Body) === null || _l === void 0 ? void 0 : _l.Intensity) === null || _m === void 0 ? void 0 : _m.Observation) === null || _o === void 0 ? void 0 : _o.MaxInt) !== null && _p !== void 0 ? _p : '不明';
             const hypocenterObj = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter;
             console.log('Hypocenter:', hypocenterObj);
+            console.log('jmaImageUrl:', jmaImageUrl);
             const embed = new discord_js_1.EmbedBuilder()
                 .setTitle('直近の地震情報（気象庁）')
                 .setDescription(`発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`)
