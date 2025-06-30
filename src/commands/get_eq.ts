@@ -4,6 +4,21 @@ export const data = new SlashCommandBuilder()
     .setName('get_eq')
     .setDescription('直近に発表された地震情報を取得します（気象庁データ）')
 
+function maxScaleToString(maxScale: number): string {
+    switch (maxScale) {
+        case 10: return '1'
+        case 20: return '2'
+        case 30: return '3'
+        case 40: return '4'
+        case 45: return '5弱'
+        case 50: return '5強'
+        case 55: return '6弱'
+        case 60: return '6強'
+        case 70: return '7'
+        default: return String(maxScale)
+    }
+}
+
 export async function execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply()
     try {
@@ -13,9 +28,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             await interaction.editReply('直近の地震情報が見つかりませんでした。')
             return
         }
-        const latestId = list[0].json;
-        const imageUrl = latestId.replace('.json', '.png');
-        const jmaImageUrl = `https://www.jma.go.jp/bosai/quake/data/${imageUrl}`;
+        const latestId = list[0].json
+        const imageUrl = latestId.replace('.json', '.png')
+        const jmaImageUrl = `https://www.jma.go.jp/bosai/quake/data/${imageUrl}`
 
         const detailRes = await fetch(`https://www.jma.go.jp/bosai/quake/data/${latestId}`)
         const detail = await detailRes.json() as any
@@ -24,30 +39,46 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         const hypocenter = detail.Body?.Earthquake?.Hypocenter?.Area?.Name ?? '不明'
         const magnitude = detail.Body?.Earthquake?.Magnitude ?? '不明'
         const maxScale = detail.Body?.Intensity?.Observation?.MaxInt ?? '不明'
-        const hypocenterObj = detail.Body?.Earthquake?.Hypocenter;
-        const lat = hypocenterObj?.Latitude ?? hypocenterObj?.latitude;
-        const lon = hypocenterObj?.Longitude ?? hypocenterObj?.longitude;
-        console.log('Hypocenter:', hypocenterObj);
-        console.log('jmaImageUrl:', jmaImageUrl);
+        const hypocenterObj = detail.Body?.Earthquake?.Hypocenter
 
-        const response = await fetch(jmaImageUrl);
-        let imageExists = false;
-        if (response.ok) {
-            imageExists = true;
+        // 震度画像URL
+        let shindoImageUrl: string | undefined = undefined
+        switch (maxScale) {
+            case 10: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/1.png'; break
+            case 20: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/2.png'; break
+            case 30: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/3.png'; break
+            case 40: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/4.png'; break
+            case 45: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/5-.png'; break
+            case 50: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/5+.png'; break
+            case 55: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/6-.png'; break
+            case 60: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/6+.png'; break
+            case 70: shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/7.png'; break
+            default: shindoImageUrl = undefined
         }
 
+        // 埋め込み作成
         const embed = new EmbedBuilder()
-            .setTitle('直近の地震情報（気象庁）')
+            .setTitle('【地震情報】')
+            .setColor(0xff9900)
             .setDescription(
-                `発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`
+                `**最大震度**: ${maxScale !== '不明' ? maxScaleToString(Number(maxScale)) : '不明'}\n` +
+                `**震源地**: ${hypocenter}\n` +
+                `**発生時刻**: ${time}\n` +
+                `**マグニチュード**: ${magnitude}`
             )
-            .setColor(0xff9900);
 
-        if (imageExists) {
-            embed.setImage(jmaImageUrl);
+        // 震度画像をサムネイルに
+        if (shindoImageUrl) {
+            embed.setThumbnail(shindoImageUrl)
         }
 
-        await interaction.editReply({ embeds: [embed] });
+        // 震度分布画像（気象庁公式）を埋め込み画像に
+        const response = await fetch(jmaImageUrl)
+        if (response.ok) {
+            embed.setImage(jmaImageUrl)
+        }
+
+        await interaction.editReply({ embeds: [embed] })
     } catch (e) {
         console.error(e)
         await interaction.editReply('地震情報の取得中にエラーが発生しました。')

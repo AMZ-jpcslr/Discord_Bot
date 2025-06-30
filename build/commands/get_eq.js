@@ -15,9 +15,23 @@ const discord_js_1 = require("discord.js");
 exports.data = new discord_js_1.SlashCommandBuilder()
     .setName('get_eq')
     .setDescription('直近に発表された地震情報を取得します（気象庁データ）');
+function maxScaleToString(maxScale) {
+    switch (maxScale) {
+        case 10: return '1';
+        case 20: return '2';
+        case 30: return '3';
+        case 40: return '4';
+        case 45: return '5弱';
+        case 50: return '5強';
+        case 55: return '6弱';
+        case 60: return '6強';
+        case 70: return '7';
+        default: return String(maxScale);
+    }
+}
 function execute(interaction) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
         yield interaction.deferReply();
         try {
             const res = yield fetch('https://www.jma.go.jp/bosai/quake/data/list.json');
@@ -36,20 +50,53 @@ function execute(interaction) {
             const magnitude = (_k = (_j = (_h = detail.Body) === null || _h === void 0 ? void 0 : _h.Earthquake) === null || _j === void 0 ? void 0 : _j.Magnitude) !== null && _k !== void 0 ? _k : '不明';
             const maxScale = (_p = (_o = (_m = (_l = detail.Body) === null || _l === void 0 ? void 0 : _l.Intensity) === null || _m === void 0 ? void 0 : _m.Observation) === null || _o === void 0 ? void 0 : _o.MaxInt) !== null && _p !== void 0 ? _p : '不明';
             const hypocenterObj = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter;
-            const lat = (_s = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Latitude) !== null && _s !== void 0 ? _s : hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.latitude;
-            const lon = (_t = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Longitude) !== null && _t !== void 0 ? _t : hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.longitude;
-            console.log('Hypocenter:', hypocenterObj);
-            console.log('jmaImageUrl:', jmaImageUrl);
-            const response = yield fetch(jmaImageUrl);
-            let imageExists = false;
-            if (response.ok) {
-                imageExists = true;
+            // 震度画像URL
+            let shindoImageUrl = undefined;
+            switch (maxScale) {
+                case 10:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/1.png';
+                    break;
+                case 20:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/2.png';
+                    break;
+                case 30:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/3.png';
+                    break;
+                case 40:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/4.png';
+                    break;
+                case 45:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/5-.png';
+                    break;
+                case 50:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/5+.png';
+                    break;
+                case 55:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/6-.png';
+                    break;
+                case 60:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/6+.png';
+                    break;
+                case 70:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/7.png';
+                    break;
+                default: shindoImageUrl = undefined;
             }
+            // 埋め込み作成
             const embed = new discord_js_1.EmbedBuilder()
-                .setTitle('直近の地震情報（気象庁）')
-                .setDescription(`発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`)
-                .setColor(0xff9900);
-            if (imageExists) {
+                .setTitle('【地震情報】')
+                .setColor(0xff9900)
+                .setDescription(`**最大震度**: ${maxScale !== '不明' ? maxScaleToString(Number(maxScale)) : '不明'}\n` +
+                `**震源地**: ${hypocenter}\n` +
+                `**発生時刻**: ${time}\n` +
+                `**マグニチュード**: ${magnitude}`);
+            // 震度画像をサムネイルに
+            if (shindoImageUrl) {
+                embed.setThumbnail(shindoImageUrl);
+            }
+            // 震度分布画像（気象庁公式）を埋め込み画像に
+            const response = yield fetch(jmaImageUrl);
+            if (response.ok) {
                 embed.setImage(jmaImageUrl);
             }
             yield interaction.editReply({ embeds: [embed] });
