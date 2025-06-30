@@ -50,6 +50,7 @@ const pingCommand = __importStar(require("./commands/ping"));
 const lotteryCommand = __importStar(require("./commands/lottery")); // ←追加
 const shiftCommand = __importStar(require("./commands/shift"));
 const setEqChannelCommand = __importStar(require("./commands/set_eq_channel"));
+const getEqCommand = __importStar(require("./commands/get_eq"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -103,6 +104,9 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
     }
     if (interaction.commandName === 'set_eq_channel') {
         yield setEqChannelCommand.execute(interaction);
+    }
+    if (interaction.commandName === 'get_eq') {
+        yield getEqCommand.execute(interaction);
     }
 }));
 client.login(process.env.TOKEN);

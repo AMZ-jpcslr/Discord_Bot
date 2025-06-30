@@ -3,6 +3,7 @@ import * as pingCommand from './commands/ping'
 import * as lotteryCommand from './commands/lottery' // ←追加
 import * as shiftCommand from './commands/shift'
 import * as setEqChannelCommand from './commands/set_eq_channel'
+import * as getEqCommand from './commands/get_eq'
 import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
@@ -63,6 +64,9 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.commandName === 'set_eq_channel') {
         await setEqChannelCommand.execute(interaction)
+    }
+    if (interaction.commandName === 'get_eq') {
+        await getEqCommand.execute(interaction)
     }
 })
 
