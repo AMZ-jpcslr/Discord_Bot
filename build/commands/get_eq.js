@@ -17,7 +17,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDescription('直近に発表された地震情報を取得します（気象庁データ）');
 function execute(interaction) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
         yield interaction.deferReply();
         try {
             const res = yield fetch('https://www.jma.go.jp/bosai/quake/data/list.json');
@@ -27,7 +27,7 @@ function execute(interaction) {
                 return;
             }
             const latestId = list[0].json;
-            const imageUrl = latestId.replace('.json', '.png'); // 例: 20240630012345.json → 20240630012345.png
+            const imageUrl = latestId.replace('.json', '.png');
             const jmaImageUrl = `https://www.jma.go.jp/bosai/quake/data/${imageUrl}`;
             const detailRes = yield fetch(`https://www.jma.go.jp/bosai/quake/data/${latestId}`);
             const detail = yield detailRes.json();
@@ -37,28 +37,11 @@ function execute(interaction) {
             const maxScale = (_p = (_o = (_m = (_l = detail.Body) === null || _l === void 0 ? void 0 : _l.Intensity) === null || _m === void 0 ? void 0 : _m.Observation) === null || _o === void 0 ? void 0 : _o.MaxInt) !== null && _p !== void 0 ? _p : '不明';
             const hypocenterObj = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter;
             console.log('Hypocenter:', hypocenterObj);
-            let lat, lon;
-            const coordinate = (_s = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Area) === null || _s === void 0 ? void 0 : _s.Coordinate;
-            if (coordinate) {
-                const match = coordinate.match(/([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)/);
-                if (match) {
-                    lat = match[1];
-                    lon = match[2];
-                }
-            }
-            const cleanLat = lat === null || lat === void 0 ? void 0 : lat.replace('+', '');
-            const cleanLon = lon === null || lon === void 0 ? void 0 : lon.replace('+', '');
-            // GEOAPIFY_API_KEY を自分のものに置き換えてください
-            const GEOAPIFY_API_KEY = 'e696a7e617a747b6a83c3f127c355253';
-            const mapUrl = (cleanLat && cleanLon)
-                ? `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=450&height=300&center=lonlat:${cleanLon},${cleanLat}&zoom=6&marker=lonlat:${cleanLon},${cleanLat};color:%23ff0000;size:large&apiKey=${GEOAPIFY_API_KEY}`
-                : undefined;
-            console.log('lat:', cleanLat, 'lon:', cleanLon, 'mapUrl:', mapUrl);
             const embed = new discord_js_1.EmbedBuilder()
                 .setTitle('直近の地震情報（気象庁）')
                 .setDescription(`発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`)
                 .setColor(0xff9900)
-                .setImage(jmaImageUrl); // ←ここで公式画像を表示
+                .setImage(jmaImageUrl); // 公式震度分布画像のみ
             yield interaction.editReply({ embeds: [embed] });
         }
         catch (e) {

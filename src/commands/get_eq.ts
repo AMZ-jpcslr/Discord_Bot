@@ -13,8 +13,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             await interaction.editReply('直近の地震情報が見つかりませんでした。')
             return
         }
-        const latestId = list[0].json
-        const imageUrl = latestId.replace('.json', '.png'); // 例: 20240630012345.json → 20240630012345.png
+        const latestId = list[0].json;
+        const imageUrl = latestId.replace('.json', '.png');
         const jmaImageUrl = `https://www.jma.go.jp/bosai/quake/data/${imageUrl}`;
 
         const detailRes = await fetch(`https://www.jma.go.jp/bosai/quake/data/${latestId}`)
@@ -27,34 +27,15 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         const hypocenterObj = detail.Body?.Earthquake?.Hypocenter;
         console.log('Hypocenter:', hypocenterObj);
 
-        let lat: string | undefined, lon: string | undefined;
-        const coordinate = hypocenterObj?.Area?.Coordinate;
-        if (coordinate) {
-            const match = coordinate.match(/([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)/);
-            if (match) {
-                lat = match[1];
-                lon = match[2];
-            }
-        }
-        const cleanLat = lat?.replace('+', '');
-        const cleanLon = lon?.replace('+', '');
-        // GEOAPIFY_API_KEY を自分のものに置き換えてください
-        const GEOAPIFY_API_KEY = 'e696a7e617a747b6a83c3f127c355253';
-        const mapUrl = (cleanLat && cleanLon)
-            ? `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=450&height=300&center=lonlat:${cleanLon},${cleanLat}&zoom=6&marker=lonlat:${cleanLon},${cleanLat};color:%23ff0000;size:large&apiKey=${GEOAPIFY_API_KEY}`
-            : undefined;
-
-        console.log('lat:', cleanLat, 'lon:', cleanLon, 'mapUrl:', mapUrl);
-
         const embed = new EmbedBuilder()
             .setTitle('直近の地震情報（気象庁）')
             .setDescription(
                 `発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`
             )
             .setColor(0xff9900)
-            .setImage(jmaImageUrl); // ←ここで公式画像を表示
+            .setImage(jmaImageUrl); // 公式震度分布画像のみ
 
-        await interaction.editReply({ embeds: [embed] })
+        await interaction.editReply({ embeds: [embed] });
     } catch (e) {
         console.error(e)
         await interaction.editReply('地震情報の取得中にエラーが発生しました。')
