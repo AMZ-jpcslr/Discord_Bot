@@ -22,7 +22,8 @@
     "@discordjs/rest": "^2.5.1",
     "discord-api-types": "^0.38.12",
     "discord.js": "^14.21.0",
-    "dotenv": "^16.6.0"
+    "dotenv": "^16.6.0",
+    "ws": "^8.18.3"
   },
   "description": ""
 }

@@ -49,7 +49,12 @@ const discord_js_1 = require("discord.js");
 const pingCommand = __importStar(require("./commands/ping"));
 const lotteryCommand = __importStar(require("./commands/lottery")); // ←追加
 const shiftCommand = __importStar(require("./commands/shift"));
+const setEqChannelCommand = __importStar(require("./commands/set_eq_channel"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const discord_js_2 = require("discord.js");
+const ws_1 = __importDefault(require("ws"));
 dotenv_1.default.config();
 const client = new discord_js_1.Client({
     intents: [
@@ -96,5 +101,46 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
     if (interaction.commandName === 'shift') {
         yield shiftCommand.execute(interaction);
     }
+    if (interaction.commandName === 'set_eq_channel') {
+        yield setEqChannelCommand.execute(interaction);
+    }
 }));
 client.login(process.env.TOKEN);
+// 緊急地震速報の受信（例: P2P地震情報 WebSocket）
+const ws = new ws_1.default('wss://api.p2pquake.net/v2/ws');
+ws.on('message', (data) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const json = JSON.parse(data.toString());
+        if (json.code === 551) { // 緊急地震速報
+            const { hypocenter, magnitude, maxScale, time } = json;
+            const lat = hypocenter.latitude;
+            const lon = hypocenter.longitude;
+            const place = hypocenter.name;
+            // 地図画像URL例（OpenStreetMap Static）
+            const mapUrl = `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=6&size=450,300&l=map&pt=${lon},${lat},pm2rdm`;
+            const embed = new discord_js_2.EmbedBuilder()
+                .setTitle('【緊急地震速報】')
+                .setDescription(`震源地: ${place}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}\n発生時刻: ${time}`)
+                .setImage(mapUrl)
+                .setColor(0xff0000);
+            // 通知チャンネル取得
+            const channelsPath = path_1.default.join(__dirname, '../data/eq_channels.json');
+            if (!fs_1.default.existsSync(channelsPath))
+                return;
+            const channels = JSON.parse(fs_1.default.readFileSync(channelsPath, 'utf8'));
+            for (const guildId in channels) {
+                const channelId = channels[guildId];
+                const guild = client.guilds.cache.get(guildId);
+                if (!guild)
+                    continue;
+                const channel = guild.channels.cache.get(channelId);
+                if (channel && channel.isTextBased()) {
+                    channel.send({ embeds: [embed] });
+                }
+            }
+        }
+    }
+    catch (e) {
+        console.error('地震速報通知エラー:', e);
+    }
+}));
