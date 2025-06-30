@@ -21,8 +21,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         const hypocenter = detail.Body?.Earthquake?.Hypocenter?.Area?.Name ?? '不明'
         const magnitude = detail.Body?.Earthquake?.Magnitude ?? '不明'
         const maxScale = detail.Body?.Intensity?.Observation?.MaxInt ?? '不明'
-        const lat = detail.Body?.Earthquake?.Hypocenter?.Latitude
-        const lon = detail.Body?.Earthquake?.Hypocenter?.Longitude
+        const hypocenterObj = detail.Body?.Earthquake?.Hypocenter;
+        console.log('Hypocenter:', hypocenterObj);
+
+        const lat = hypocenterObj?.Latitude;
+        const lon = hypocenterObj?.Longitude;
         const mapUrl = (lat && lon)
             ? `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=6&size=450x300&markers=${lat},${lon},red-pushpin`
             : undefined;

@@ -17,7 +17,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDescription('直近に発表された地震情報を取得します（気象庁データ）');
 function execute(interaction) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
         yield interaction.deferReply();
         try {
             const res = yield fetch('https://www.jma.go.jp/bosai/quake/data/list.json');
@@ -33,8 +33,10 @@ function execute(interaction) {
             const hypocenter = (_g = (_f = (_e = (_d = (_c = detail.Body) === null || _c === void 0 ? void 0 : _c.Earthquake) === null || _d === void 0 ? void 0 : _d.Hypocenter) === null || _e === void 0 ? void 0 : _e.Area) === null || _f === void 0 ? void 0 : _f.Name) !== null && _g !== void 0 ? _g : '不明';
             const magnitude = (_k = (_j = (_h = detail.Body) === null || _h === void 0 ? void 0 : _h.Earthquake) === null || _j === void 0 ? void 0 : _j.Magnitude) !== null && _k !== void 0 ? _k : '不明';
             const maxScale = (_p = (_o = (_m = (_l = detail.Body) === null || _l === void 0 ? void 0 : _l.Intensity) === null || _m === void 0 ? void 0 : _m.Observation) === null || _o === void 0 ? void 0 : _o.MaxInt) !== null && _p !== void 0 ? _p : '不明';
-            const lat = (_s = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter) === null || _s === void 0 ? void 0 : _s.Latitude;
-            const lon = (_v = (_u = (_t = detail.Body) === null || _t === void 0 ? void 0 : _t.Earthquake) === null || _u === void 0 ? void 0 : _u.Hypocenter) === null || _v === void 0 ? void 0 : _v.Longitude;
+            const hypocenterObj = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter;
+            console.log('Hypocenter:', hypocenterObj);
+            const lat = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Latitude;
+            const lon = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Longitude;
             const mapUrl = (lat && lon)
                 ? `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=6&size=450x300&markers=${lat},${lon},red-pushpin`
                 : undefined;
