@@ -36,7 +36,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         const cleanLat = lat?.replace('+', '');
         const cleanLon = lon?.replace('+', '');
         // GEOAPIFY_API_KEY を自分のものに置き換えてください
-        const GEOAPIFY_API_KEY = 'ここにAPIキー';
+        const GEOAPIFY_API_KEY = 'e696a7e617a747b6a83c3f127c355253';
         const mapUrl = (cleanLat && cleanLon)
             ? `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=450&height=300&center=lonlat:${cleanLon},${cleanLat}&zoom=6&marker=lonlat:${cleanLon},${cleanLat};color:%23ff0000;size:large&apiKey=${GEOAPIFY_API_KEY}`
             : undefined;
