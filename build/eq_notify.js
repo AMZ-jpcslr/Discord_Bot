@@ -45,16 +45,28 @@ function startEqAutoNotify(client) {
             if (!list.length)
                 return;
             const latestId = (_a = list[0]) === null || _a === void 0 ? void 0 : _a.json;
-            if (!latestId || typeof latestId !== 'string' || !latestId.endsWith('.json')) {
+            if (!latestId ||
+                typeof latestId !== 'string' ||
+                !latestId.endsWith('.json') ||
+                latestId.startsWith('/') || // 先頭が/の場合も不正
+                latestId.includes('..') // パストラバーサル防止
+            ) {
                 console.warn('不正なlatestId:', latestId);
                 return;
             }
             if (latestId === loadLatestId())
                 return; // すでに通知済み
             const detailUrl = `https://www.jma.go.jp/bosai/quake/data/${latestId}`;
+            try {
+                new URL(detailUrl); // URLとしてパースできるかチェック
+            }
+            catch (_x) {
+                console.warn('不正なURL:', detailUrl);
+                return;
+            }
             console.log('地震詳細取得URL:', detailUrl);
             const detailRes = yield (0, undici_1.fetch)(detailUrl);
-            const detail = yield detailRes.json(); // ← 型アサーションを追加
+            const detail = yield detailRes.json();
             // 必要な情報を抽出
             const time = (_c = (_b = detail.Head) === null || _b === void 0 ? void 0 : _b.ReportDateTime) !== null && _c !== void 0 ? _c : '不明';
             const hypocenter = (_h = (_g = (_f = (_e = (_d = detail.Body) === null || _d === void 0 ? void 0 : _d.Earthquake) === null || _e === void 0 ? void 0 : _e.Hypocenter) === null || _f === void 0 ? void 0 : _f.Area) === null || _g === void 0 ? void 0 : _g.Name) !== null && _h !== void 0 ? _h : '不明';

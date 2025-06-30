@@ -29,17 +29,31 @@ export function startEqAutoNotify(client: Client) {
             const res = await fetch('https://www.jma.go.jp/bosai/quake/data/list.json')
             const list = await res.json() as { json: string }[]
             if (!list.length) return
-            const latestId = list[0]?.json;
-if (!latestId || typeof latestId !== 'string' || !latestId.endsWith('.json')) {
-    console.warn('不正なlatestId:', latestId);
-    return;
-}
-if (latestId === loadLatestId()) return; // すでに通知済み
 
-const detailUrl = `https://www.jma.go.jp/bosai/quake/data/${latestId}`;
-console.log('地震詳細取得URL:', detailUrl);
-const detailRes = await fetch(detailUrl);
-const detail = await detailRes.json() as any; // ← 型アサーションを追加
+            const latestId = list[0]?.json
+            if (
+                !latestId ||
+                typeof latestId !== 'string' ||
+                !latestId.endsWith('.json') ||
+                latestId.startsWith('/') || // 先頭が/の場合も不正
+                latestId.includes('..')     // パストラバーサル防止
+            ) {
+                console.warn('不正なlatestId:', latestId)
+                return
+            }
+            if (latestId === loadLatestId()) return // すでに通知済み
+
+            const detailUrl = `https://www.jma.go.jp/bosai/quake/data/${latestId}`
+            try {
+                new URL(detailUrl) // URLとしてパースできるかチェック
+            } catch {
+                console.warn('不正なURL:', detailUrl)
+                return
+            }
+            console.log('地震詳細取得URL:', detailUrl)
+
+            const detailRes = await fetch(detailUrl)
+            const detail = await detailRes.json() as any
 
             // 必要な情報を抽出
             const time = detail.Head?.ReportDateTime ?? '不明'
