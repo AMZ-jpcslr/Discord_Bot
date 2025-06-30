@@ -38,25 +38,29 @@ function saveLatestId(id) {
 // 定期的に気象庁APIを監視して新しい地震があれば通知
 function startEqAutoNotify(client) {
     setInterval(() => __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
         try {
             const res = yield (0, undici_1.fetch)('https://www.jma.go.jp/bosai/quake/data/list.json');
             const list = yield res.json();
             if (!list.length)
                 return;
-            const latestId = list[0].json;
+            const latestId = (_a = list[0]) === null || _a === void 0 ? void 0 : _a.json;
+            if (!latestId)
+                return; // ← 追加
             if (latestId === loadLatestId())
                 return; // すでに通知済み
             // 詳細取得
-            const detailRes = yield (0, undici_1.fetch)(`https://www.jma.go.jp/bosai/quake/data/${latestId}`);
+            const detailUrl = `https://www.jma.go.jp/bosai/quake/data/${latestId}`;
+            console.log('地震詳細取得URL:', detailUrl);
+            const detailRes = yield (0, undici_1.fetch)(detailUrl);
             const detail = yield detailRes.json(); // ← 型アサーションを追加
             // 必要な情報を抽出
-            const time = (_b = (_a = detail.Head) === null || _a === void 0 ? void 0 : _a.ReportDateTime) !== null && _b !== void 0 ? _b : '不明';
-            const hypocenter = (_g = (_f = (_e = (_d = (_c = detail.Body) === null || _c === void 0 ? void 0 : _c.Earthquake) === null || _d === void 0 ? void 0 : _d.Hypocenter) === null || _e === void 0 ? void 0 : _e.Area) === null || _f === void 0 ? void 0 : _f.Name) !== null && _g !== void 0 ? _g : '不明';
-            const magnitude = (_k = (_j = (_h = detail.Body) === null || _h === void 0 ? void 0 : _h.Earthquake) === null || _j === void 0 ? void 0 : _j.Magnitude) !== null && _k !== void 0 ? _k : '不明';
-            const maxScale = (_p = (_o = (_m = (_l = detail.Body) === null || _l === void 0 ? void 0 : _l.Intensity) === null || _m === void 0 ? void 0 : _m.Observation) === null || _o === void 0 ? void 0 : _o.MaxInt) !== null && _p !== void 0 ? _p : '不明';
-            const lat = (_s = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter) === null || _s === void 0 ? void 0 : _s.Latitude;
-            const lon = (_v = (_u = (_t = detail.Body) === null || _t === void 0 ? void 0 : _t.Earthquake) === null || _u === void 0 ? void 0 : _u.Hypocenter) === null || _v === void 0 ? void 0 : _v.Longitude;
+            const time = (_c = (_b = detail.Head) === null || _b === void 0 ? void 0 : _b.ReportDateTime) !== null && _c !== void 0 ? _c : '不明';
+            const hypocenter = (_h = (_g = (_f = (_e = (_d = detail.Body) === null || _d === void 0 ? void 0 : _d.Earthquake) === null || _e === void 0 ? void 0 : _e.Hypocenter) === null || _f === void 0 ? void 0 : _f.Area) === null || _g === void 0 ? void 0 : _g.Name) !== null && _h !== void 0 ? _h : '不明';
+            const magnitude = (_l = (_k = (_j = detail.Body) === null || _j === void 0 ? void 0 : _j.Earthquake) === null || _k === void 0 ? void 0 : _k.Magnitude) !== null && _l !== void 0 ? _l : '不明';
+            const maxScale = (_q = (_p = (_o = (_m = detail.Body) === null || _m === void 0 ? void 0 : _m.Intensity) === null || _o === void 0 ? void 0 : _o.Observation) === null || _p === void 0 ? void 0 : _p.MaxInt) !== null && _q !== void 0 ? _q : '不明';
+            const lat = (_t = (_s = (_r = detail.Body) === null || _r === void 0 ? void 0 : _r.Earthquake) === null || _s === void 0 ? void 0 : _s.Hypocenter) === null || _t === void 0 ? void 0 : _t.Latitude;
+            const lon = (_w = (_v = (_u = detail.Body) === null || _u === void 0 ? void 0 : _u.Earthquake) === null || _v === void 0 ? void 0 : _v.Hypocenter) === null || _w === void 0 ? void 0 : _w.Longitude;
             const mapUrl = (lat && lon)
                 ? `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=6&size=450,300&l=map&pt=${lon},${lat},pm2rdm`
                 : undefined;
