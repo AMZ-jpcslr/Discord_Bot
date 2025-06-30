@@ -1,5 +1,4 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
-import { fetch } from 'undici'
 
 export const data = new SlashCommandBuilder()
     .setName('get_eq')
@@ -8,19 +7,16 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply()
     try {
-        // 最新の地震リスト取得
         const res = await fetch('https://www.jma.go.jp/bosai/quake/data/list.json')
         const list = await res.json() as { json: string }[]
         if (!list.length) {
             await interaction.editReply('直近の地震情報が見つかりませんでした。')
             return
         }
-        // 最新1件の詳細取得
         const latestId = list[0].json
         const detailRes = await fetch(`https://www.jma.go.jp/bosai/quake/data/${latestId}`)
-        const detail = await detailRes.json() as any; // ←ここを修正
+        const detail = await detailRes.json() as any
 
-        // 必要な情報を抽出
         const time = detail.Head?.ReportDateTime ?? '不明'
         const hypocenter = detail.Body?.Earthquake?.Hypocenter?.Area?.Name ?? '不明'
         const magnitude = detail.Body?.Earthquake?.Magnitude ?? '不明'
@@ -38,6 +34,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             )
             .setColor(0xff9900)
         if (mapUrl) embed.setImage(mapUrl)
+
         await interaction.editReply({ embeds: [embed] })
     } catch (e) {
         console.error(e)

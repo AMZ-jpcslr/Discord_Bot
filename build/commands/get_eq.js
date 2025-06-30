@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = void 0;
 exports.execute = execute;
 const discord_js_1 = require("discord.js");
-const undici_1 = require("undici");
 exports.data = new discord_js_1.SlashCommandBuilder()
     .setName('get_eq')
     .setDescription('直近に発表された地震情報を取得します（気象庁データ）');
@@ -21,18 +20,15 @@ function execute(interaction) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
         yield interaction.deferReply();
         try {
-            // 最新の地震リスト取得
-            const res = yield (0, undici_1.fetch)('https://www.jma.go.jp/bosai/quake/data/list.json');
+            const res = yield fetch('https://www.jma.go.jp/bosai/quake/data/list.json');
             const list = yield res.json();
             if (!list.length) {
                 yield interaction.editReply('直近の地震情報が見つかりませんでした。');
                 return;
             }
-            // 最新1件の詳細取得
             const latestId = list[0].json;
-            const detailRes = yield (0, undici_1.fetch)(`https://www.jma.go.jp/bosai/quake/data/${latestId}`);
-            const detail = yield detailRes.json(); // ←ここを修正
-            // 必要な情報を抽出
+            const detailRes = yield fetch(`https://www.jma.go.jp/bosai/quake/data/${latestId}`);
+            const detail = yield detailRes.json();
             const time = (_b = (_a = detail.Head) === null || _a === void 0 ? void 0 : _a.ReportDateTime) !== null && _b !== void 0 ? _b : '不明';
             const hypocenter = (_g = (_f = (_e = (_d = (_c = detail.Body) === null || _c === void 0 ? void 0 : _c.Earthquake) === null || _d === void 0 ? void 0 : _d.Hypocenter) === null || _e === void 0 ? void 0 : _e.Area) === null || _f === void 0 ? void 0 : _f.Name) !== null && _g !== void 0 ? _g : '不明';
             const magnitude = (_k = (_j = (_h = detail.Body) === null || _h === void 0 ? void 0 : _h.Earthquake) === null || _j === void 0 ? void 0 : _j.Magnitude) !== null && _k !== void 0 ? _k : '不明';
