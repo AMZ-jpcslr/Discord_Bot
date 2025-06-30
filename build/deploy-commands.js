@@ -17,11 +17,13 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const ping_1 = require("./commands/ping");
 const lottery_1 = require("./commands/lottery");
 const shift_1 = require("./commands/shift");
+const set_eq_channel_1 = require("./commands/set_eq_channel");
 dotenv_1.default.config();
 const commands = [
     ping_1.data.toJSON(),
     lottery_1.data.toJSON(),
-    shift_1.data.toJSON(), // ←追加
+    shift_1.data.toJSON(),
+    set_eq_channel_1.data.toJSON(),
 ];
 const rest = new discord_js_1.REST({ version: '10' }).setToken(process.env.TOKEN);
 function main() {
