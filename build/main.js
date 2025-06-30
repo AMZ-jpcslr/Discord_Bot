@@ -115,20 +115,69 @@ client.login(process.env.TOKEN);
 // 緊急地震速報の受信（例: P2P地震情報 WebSocket）
 const ws = new ws_1.default('wss://api.p2pquake.net/v2/ws');
 ws.on('message', (data) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const json = JSON.parse(data.toString());
         if (json.code === 551) { // 緊急地震速報
             const { hypocenter, magnitude, maxScale, time } = json;
-            const lat = hypocenter.latitude;
-            const lon = hypocenter.longitude;
-            const place = hypocenter.name;
-            // 地図画像URL例（OpenStreetMap Static）
-            const mapUrl = `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=6&size=450,300&l=map&pt=${lon},${lat},pm2rdm`;
+            const lat = hypocenter === null || hypocenter === void 0 ? void 0 : hypocenter.latitude;
+            const lon = hypocenter === null || hypocenter === void 0 ? void 0 : hypocenter.longitude;
+            const place = (_a = hypocenter === null || hypocenter === void 0 ? void 0 : hypocenter.name) !== null && _a !== void 0 ? _a : '不明';
+            // 震度画像URL（例: 気象庁風アイコン。自作やフリー素材を使う場合はURLを差し替えてください）
+            // ここでは例として「震度5強」のアイコン画像URLを使用
+            // 震度ごとに画像を切り替えたい場合はmaxScaleの値で分岐してください
+            let shindoImageUrl = undefined;
+            switch (maxScale) {
+                case 10:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/1.png';
+                    break; // 震度1
+                case 20:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/2.png';
+                    break; // 震度2
+                case 30:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/3.png';
+                    break; // 震度3
+                case 40:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/4.png';
+                    break; // 震度4
+                case 45:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/5-.png';
+                    break; // 震度5弱
+                case 50:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/5+.png';
+                    break; // 震度5強
+                case 55:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/6-.png';
+                    break; // 震度6弱
+                case 60:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/6+.png';
+                    break; // 震度6強
+                case 70:
+                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/7.png';
+                    break; // 震度7
+                default: shindoImageUrl = undefined;
+            }
+            // 地図画像
+            let mapUrl = undefined;
+            if (lat && lon) {
+                mapUrl = `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=6&size=450,300&l=map&pt=${lon},${lat},pm2rdm`;
+            }
+            // Embed作成
             const embed = new discord_js_2.EmbedBuilder()
                 .setTitle('【緊急地震速報】')
-                .setDescription(`震源地: ${place}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}\n発生時刻: ${time}`)
-                .setImage(mapUrl)
-                .setColor(0xff0000);
+                .setColor(0xff0000)
+                .setDescription(`**震源地**: ${place}\n` +
+                `**発生時刻**: ${time}\n` +
+                `**マグニチュード**: ${magnitude}\n` +
+                `**最大震度**: ${maxScale !== undefined ? maxScaleToString(maxScale) : '不明'}`);
+            // 震度画像をサムネイルに
+            if (shindoImageUrl) {
+                embed.setThumbnail(shindoImageUrl);
+            }
+            // 地図画像を埋め込み画像に
+            if (mapUrl) {
+                embed.setImage(mapUrl);
+            }
             // 通知チャンネル取得
             const channelsPath = path_1.default.join(__dirname, '../data/eq_channels.json');
             if (!fs_1.default.existsSync(channelsPath))
@@ -150,3 +199,18 @@ ws.on('message', (data) => __awaiter(void 0, void 0, void 0, function* () {
         console.error('地震速報通知エラー:', e);
     }
 }));
+// 震度コードを日本語表記に変換する関数
+function maxScaleToString(maxScale) {
+    switch (maxScale) {
+        case 10: return '1';
+        case 20: return '2';
+        case 30: return '3';
+        case 40: return '4';
+        case 45: return '5弱';
+        case 50: return '5強';
+        case 55: return '6弱';
+        case 60: return '6強';
+        case 70: return '7';
+        default: return String(maxScale);
+    }
+}

@@ -25,6 +25,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         const magnitude = detail.Body?.Earthquake?.Magnitude ?? '不明'
         const maxScale = detail.Body?.Intensity?.Observation?.MaxInt ?? '不明'
         const hypocenterObj = detail.Body?.Earthquake?.Hypocenter;
+        const lat = hypocenterObj?.Latitude ?? hypocenterObj?.latitude;
+        const lon = hypocenterObj?.Longitude ?? hypocenterObj?.longitude;
         console.log('Hypocenter:', hypocenterObj);
         console.log('jmaImageUrl:', jmaImageUrl);
 
