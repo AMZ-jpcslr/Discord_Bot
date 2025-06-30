@@ -56,31 +56,31 @@ function execute(interaction) {
             let shindoImageUrl = undefined;
             switch (maxScale) {
                 case 10:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300018?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300018.jpg?token=GHSAT0AAAAAADGG2T7ANXQR6SRXJKIUTDQ62DCVRBQ';
                     break;
                 case 20:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300017?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300017.jpg?token=GHSAT0AAAAAADGG2T7ABGGNE7PURHBWO7N22DCVRMA';
                     break;
                 case 30:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300015?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300015.jpg?token=GHSAT0AAAAAADGG2T7BGJGHXRXF2NPM7QGM2DCVRTA';
                     break;
                 case 40:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300014?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300014.jpg?token=GHSAT0AAAAAADGG2T7AYHOQV3DSPQJVTHEI2DCVRYA';
                     break;
                 case 45:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300013?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300013.jpg?token=GHSAT0AAAAAADGG2T7BCGAFRP6G7WWO4QJE2DCVR5Q';
                     break;
                 case 50:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc303658?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300012.jpg?token=GHSAT0AAAAAADGG2T7ARIE3GAFKN3WKEW7Q2DCVSCQ';
                     break;
                 case 55:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc303657?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300011.jpg?token=GHSAT0AAAAAADGG2T7AHK5SONZC2LCATADQ2DCVSIQ';
                     break;
                 case 60:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc303656?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300010.jpg?token=GHSAT0AAAAAADGG2T7BW2EDUOE5JTYUSIRK2DCVSPQ';
                     break;
                 case 70:
-                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300009?size=l';
+                    shindoImageUrl = 'https://raw.githubusercontent.com/AMZ-jpcslr/Discord_Bot/refs/heads/master/nc300009.jpg?token=GHSAT0AAAAAADGG2T7BE45YPOH6PMH45LNC2DCVSUA';
                     break;
                 default: shindoImageUrl = undefined;
             }
