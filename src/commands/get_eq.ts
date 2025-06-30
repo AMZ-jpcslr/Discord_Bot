@@ -14,6 +14,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             return
         }
         const latestId = list[0].json
+        const imageUrl = latestId.replace('.json', '.png'); // 例: 20240630012345.json → 20240630012345.png
+        const jmaImageUrl = `https://www.jma.go.jp/bosai/quake/data/${imageUrl}`;
+
         const detailRes = await fetch(`https://www.jma.go.jp/bosai/quake/data/${latestId}`)
         const detail = await detailRes.json() as any
 
@@ -48,8 +51,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             .setDescription(
                 `発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`
             )
-            .setColor(0xff9900);
-        if (mapUrl) embed.setImage(mapUrl);
+            .setColor(0xff9900)
+            .setImage(jmaImageUrl); // ←ここで公式画像を表示
 
         await interaction.editReply({ embeds: [embed] })
     } catch (e) {

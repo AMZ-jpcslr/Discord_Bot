@@ -27,6 +27,8 @@ function execute(interaction) {
                 return;
             }
             const latestId = list[0].json;
+            const imageUrl = latestId.replace('.json', '.png'); // 例: 20240630012345.json → 20240630012345.png
+            const jmaImageUrl = `https://www.jma.go.jp/bosai/quake/data/${imageUrl}`;
             const detailRes = yield fetch(`https://www.jma.go.jp/bosai/quake/data/${latestId}`);
             const detail = yield detailRes.json();
             const time = (_b = (_a = detail.Head) === null || _a === void 0 ? void 0 : _a.ReportDateTime) !== null && _b !== void 0 ? _b : '不明';
@@ -55,9 +57,8 @@ function execute(interaction) {
             const embed = new discord_js_1.EmbedBuilder()
                 .setTitle('直近の地震情報（気象庁）')
                 .setDescription(`発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`)
-                .setColor(0xff9900);
-            if (mapUrl)
-                embed.setImage(mapUrl);
+                .setColor(0xff9900)
+                .setImage(jmaImageUrl); // ←ここで公式画像を表示
             yield interaction.editReply({ embeds: [embed] });
         }
         catch (e) {
