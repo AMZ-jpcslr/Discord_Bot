@@ -129,32 +129,32 @@ ws.on('message', (data) => __awaiter(void 0, void 0, void 0, function* () {
             let shindoImageUrl = undefined;
             switch (maxScale) {
                 case 10:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/1.png';
-                    break; // 震度1
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300018?size=l';
+                    break;
                 case 20:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/2.png';
-                    break; // 震度2
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300017?size=l';
+                    break;
                 case 30:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/3.png';
-                    break; // 震度3
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300015?size=l';
+                    break;
                 case 40:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/4.png';
-                    break; // 震度4
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300014?size=l';
+                    break;
                 case 45:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/5-.png';
-                    break; // 震度5弱
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300013?size=l';
+                    break;
                 case 50:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/5+.png';
-                    break; // 震度5強
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc303658?size=l';
+                    break;
                 case 55:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/6-.png';
-                    break; // 震度6弱
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc303657?size=l';
+                    break;
                 case 60:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/6+.png';
-                    break; // 震度6強
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc303656?size=l';
+                    break;
                 case 70:
-                    shindoImageUrl = 'https://www.data.jma.go.jp/svd/eqev/data/joho/shindo_icon/7.png';
-                    break; // 震度7
+                    shindoImageUrl = 'https://deliver.commons.nicovideo.jp/thumbnail/nc300009?size=l';
+                    break;
                 default: shindoImageUrl = undefined;
             }
             // 地図画像
