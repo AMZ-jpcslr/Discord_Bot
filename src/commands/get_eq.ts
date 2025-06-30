@@ -24,8 +24,16 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         const hypocenterObj = detail.Body?.Earthquake?.Hypocenter;
         console.log('Hypocenter:', hypocenterObj);
 
-        const lat = hypocenterObj?.Latitude;
-        const lon = hypocenterObj?.Longitude;
+        let lat: string | undefined, lon: string | undefined;
+        const coordinate = hypocenterObj?.Area?.Coordinate;
+        if (coordinate) {
+            // 例: '+29.3+129.4-20000/'
+            const match = coordinate.match(/([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)/);
+            if (match) {
+                lat = match[1];
+                lon = match[2];
+            }
+        }
         const mapUrl = (lat && lon)
             ? `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=6&size=450x300&markers=${lat},${lon},red-pushpin`
             : undefined;

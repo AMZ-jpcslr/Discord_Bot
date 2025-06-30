@@ -17,7 +17,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDescription('直近に発表された地震情報を取得します（気象庁データ）');
 function execute(interaction) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
         yield interaction.deferReply();
         try {
             const res = yield fetch('https://www.jma.go.jp/bosai/quake/data/list.json');
@@ -35,8 +35,16 @@ function execute(interaction) {
             const maxScale = (_p = (_o = (_m = (_l = detail.Body) === null || _l === void 0 ? void 0 : _l.Intensity) === null || _m === void 0 ? void 0 : _m.Observation) === null || _o === void 0 ? void 0 : _o.MaxInt) !== null && _p !== void 0 ? _p : '不明';
             const hypocenterObj = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter;
             console.log('Hypocenter:', hypocenterObj);
-            const lat = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Latitude;
-            const lon = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Longitude;
+            let lat, lon;
+            const coordinate = (_s = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Area) === null || _s === void 0 ? void 0 : _s.Coordinate;
+            if (coordinate) {
+                // 例: '+29.3+129.4-20000/'
+                const match = coordinate.match(/([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)/);
+                if (match) {
+                    lat = match[1];
+                    lon = match[2];
+                }
+            }
             const mapUrl = (lat && lon)
                 ? `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=6&size=450x300&markers=${lat},${lon},red-pushpin`
                 : undefined;
