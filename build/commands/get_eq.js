@@ -38,11 +38,18 @@ function execute(interaction) {
             const hypocenterObj = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter;
             console.log('Hypocenter:', hypocenterObj);
             console.log('jmaImageUrl:', jmaImageUrl);
+            const response = yield fetch(jmaImageUrl);
+            let imageExists = false;
+            if (response.ok) {
+                imageExists = true;
+            }
             const embed = new discord_js_1.EmbedBuilder()
                 .setTitle('直近の地震情報（気象庁）')
                 .setDescription(`発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`)
-                .setColor(0xff9900)
-                .setImage(jmaImageUrl); // 公式震度分布画像のみ
+                .setColor(0xff9900);
+            if (imageExists) {
+                embed.setImage(jmaImageUrl);
+            }
             yield interaction.editReply({ embeds: [embed] });
         }
         catch (e) {

@@ -28,13 +28,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         console.log('Hypocenter:', hypocenterObj);
         console.log('jmaImageUrl:', jmaImageUrl);
 
+        const response = await fetch(jmaImageUrl);
+        let imageExists = false;
+        if (response.ok) {
+            imageExists = true;
+        }
+
         const embed = new EmbedBuilder()
             .setTitle('直近の地震情報（気象庁）')
             .setDescription(
                 `発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`
             )
-            .setColor(0xff9900)
-            .setImage(jmaImageUrl); // 公式震度分布画像のみ
+            .setColor(0xff9900);
+
+        if (imageExists) {
+            embed.setImage(jmaImageUrl);
+        }
 
         await interaction.editReply({ embeds: [embed] });
     } catch (e) {
