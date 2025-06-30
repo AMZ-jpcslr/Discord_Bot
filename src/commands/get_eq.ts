@@ -35,8 +35,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         }
         const cleanLat = lat?.replace('+', '');
         const cleanLon = lon?.replace('+', '');
+        // GEOAPIFY_API_KEY を自分のものに置き換えてください
+        const GEOAPIFY_API_KEY = 'ここにAPIキー';
         const mapUrl = (cleanLat && cleanLon)
-            ? `https://staticmap.openstreetmap.de/staticmap.php?center=${cleanLat},${cleanLon}&zoom=6&size=450x300&markers=${cleanLat},${cleanLon},red-pushpin`
+            ? `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=450&height=300&center=lonlat:${cleanLon},${cleanLat}&zoom=6&marker=lonlat:${cleanLon},${cleanLat};color:%23ff0000;size:large&apiKey=${GEOAPIFY_API_KEY}`
             : undefined;
 
         console.log('lat:', cleanLat, 'lon:', cleanLon, 'mapUrl:', mapUrl);
