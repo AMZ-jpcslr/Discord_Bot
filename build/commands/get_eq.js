@@ -1,37 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -45,38 +12,46 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = void 0;
 exports.execute = execute;
 const discord_js_1 = require("discord.js");
-// node-fetchのESM対応: applyを使わず直接引数を渡す
-const fetch = (...args) => Promise.resolve().then(() => __importStar(require('node-fetch'))).then(mod => mod.default(args[0], args[1]));
+const undici_1 = require("undici");
 exports.data = new discord_js_1.SlashCommandBuilder()
     .setName('get_eq')
-    .setDescription('直近に発表された地震情報を取得します');
+    .setDescription('直近に発表された地震情報を取得します（気象庁データ）');
 function execute(interaction) {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
         yield interaction.deferReply();
         try {
-            const res = yield fetch('https://api.p2pquake.net/v2/history?codes=551,554,561,565&limit=1');
-            const json = yield res.json();
-            if (!json.length) {
+            // 最新の地震リスト取得
+            const res = yield (0, undici_1.fetch)('https://www.jma.go.jp/bosai/quake/data/list.json');
+            const list = yield res.json();
+            if (!list.length) {
                 yield interaction.editReply('直近の地震情報が見つかりませんでした。');
                 return;
             }
-            const eq = json[0];
-            const { time, hypocenter, magnitude, maxScale } = eq;
-            const lat = hypocenter === null || hypocenter === void 0 ? void 0 : hypocenter.latitude;
-            const lon = hypocenter === null || hypocenter === void 0 ? void 0 : hypocenter.longitude;
-            const place = (hypocenter === null || hypocenter === void 0 ? void 0 : hypocenter.name) || '不明';
+            // 最新1件の詳細取得
+            const latestId = list[0].json;
+            const detailRes = yield (0, undici_1.fetch)(`https://www.jma.go.jp/bosai/quake/data/${latestId}`);
+            const detail = yield detailRes.json(); // ←ここを修正
+            // 必要な情報を抽出
+            const time = (_b = (_a = detail.Head) === null || _a === void 0 ? void 0 : _a.ReportDateTime) !== null && _b !== void 0 ? _b : '不明';
+            const hypocenter = (_g = (_f = (_e = (_d = (_c = detail.Body) === null || _c === void 0 ? void 0 : _c.Earthquake) === null || _d === void 0 ? void 0 : _d.Hypocenter) === null || _e === void 0 ? void 0 : _e.Area) === null || _f === void 0 ? void 0 : _f.Name) !== null && _g !== void 0 ? _g : '不明';
+            const magnitude = (_k = (_j = (_h = detail.Body) === null || _h === void 0 ? void 0 : _h.Earthquake) === null || _j === void 0 ? void 0 : _j.Magnitude) !== null && _k !== void 0 ? _k : '不明';
+            const maxScale = (_p = (_o = (_m = (_l = detail.Body) === null || _l === void 0 ? void 0 : _l.Intensity) === null || _m === void 0 ? void 0 : _m.Observation) === null || _o === void 0 ? void 0 : _o.MaxInt) !== null && _p !== void 0 ? _p : '不明';
+            const lat = (_s = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter) === null || _s === void 0 ? void 0 : _s.Latitude;
+            const lon = (_v = (_u = (_t = detail.Body) === null || _t === void 0 ? void 0 : _t.Earthquake) === null || _u === void 0 ? void 0 : _u.Hypocenter) === null || _v === void 0 ? void 0 : _v.Longitude;
             const mapUrl = (lat && lon)
                 ? `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=6&size=450,300&l=map&pt=${lon},${lat},pm2rdm`
                 : undefined;
             const embed = new discord_js_1.EmbedBuilder()
-                .setTitle('直近の地震情報')
-                .setDescription(`発生時刻: ${time}\n震源地: ${place}\nマグニチュード: ${magnitude !== null && magnitude !== void 0 ? magnitude : '不明'}\n最大震度: ${maxScale !== null && maxScale !== void 0 ? maxScale : '不明'}`)
+                .setTitle('直近の地震情報（気象庁）')
+                .setDescription(`発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`)
                 .setColor(0xff9900);
             if (mapUrl)
                 embed.setImage(mapUrl);
             yield interaction.editReply({ embeds: [embed] });
         }
         catch (e) {
+            console.error(e);
             yield interaction.editReply('地震情報の取得中にエラーが発生しました。');
         }
     });

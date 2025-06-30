@@ -56,6 +56,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const discord_js_2 = require("discord.js");
 const ws_1 = __importDefault(require("ws"));
+const eq_notify_1 = require("./eq_notify");
 dotenv_1.default.config();
 const client = new discord_js_1.Client({
     intents: [
@@ -84,6 +85,7 @@ client.once('ready', () => {
         const guildCount = client.guilds.cache.size;
         console.log(`Bot起動中！Ping: ${ping}ms / サーバー数: ${guildCount}`);
     }, 5 * 60 * 1000); // 5分ごと（ミリ秒に修正）
+    (0, eq_notify_1.startEqAutoNotify)(client);
 });
 // 再接続時にもステータスを再設定
 client.on('shardResume', () => {

@@ -9,6 +9,7 @@ import fs from 'fs'
 import path from 'path'
 import { EmbedBuilder, TextChannel } from 'discord.js'
 import WebSocket from 'ws'
+import { startEqAutoNotify } from './eq_notify'
 
 dotenv.config()
 
@@ -42,6 +43,8 @@ client.once('ready', () => {
         const guildCount = client.guilds.cache.size
         console.log(`Bot起動中！Ping: ${ping}ms / サーバー数: ${guildCount}`)
     }, 5 * 60 * 1000) // 5分ごと（ミリ秒に修正）
+
+    startEqAutoNotify(client)
 })
 
 // 再接続時にもステータスを再設定
