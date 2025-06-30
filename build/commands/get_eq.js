@@ -38,17 +38,18 @@ function execute(interaction) {
             let lat, lon;
             const coordinate = (_s = hypocenterObj === null || hypocenterObj === void 0 ? void 0 : hypocenterObj.Area) === null || _s === void 0 ? void 0 : _s.Coordinate;
             if (coordinate) {
-                // 例: '+29.3+129.4-20000/'
                 const match = coordinate.match(/([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)/);
                 if (match) {
                     lat = match[1];
                     lon = match[2];
                 }
             }
-            const mapUrl = (lat && lon)
-                ? `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=6&size=450x300&markers=${lat},${lon},red-pushpin`
+            const cleanLat = lat === null || lat === void 0 ? void 0 : lat.replace('+', '');
+            const cleanLon = lon === null || lon === void 0 ? void 0 : lon.replace('+', '');
+            const mapUrl = (cleanLat && cleanLon)
+                ? `https://staticmap.openstreetmap.de/staticmap.php?center=${cleanLat},${cleanLon}&zoom=6&size=450x300&markers=${cleanLat},${cleanLon},red-pushpin`
                 : undefined;
-            console.log('lat:', lat, 'lon:', lon, 'mapUrl:', mapUrl);
+            console.log('lat:', cleanLat, 'lon:', cleanLon, 'mapUrl:', mapUrl);
             const embed = new discord_js_1.EmbedBuilder()
                 .setTitle('直近の地震情報（気象庁）')
                 .setDescription(`発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`)

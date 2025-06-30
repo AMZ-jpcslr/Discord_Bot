@@ -27,26 +27,27 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         let lat: string | undefined, lon: string | undefined;
         const coordinate = hypocenterObj?.Area?.Coordinate;
         if (coordinate) {
-            // 例: '+29.3+129.4-20000/'
             const match = coordinate.match(/([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)/);
             if (match) {
                 lat = match[1];
                 lon = match[2];
             }
         }
-        const mapUrl = (lat && lon)
-            ? `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=6&size=450x300&markers=${lat},${lon},red-pushpin`
+        const cleanLat = lat?.replace('+', '');
+        const cleanLon = lon?.replace('+', '');
+        const mapUrl = (cleanLat && cleanLon)
+            ? `https://staticmap.openstreetmap.de/staticmap.php?center=${cleanLat},${cleanLon}&zoom=6&size=450x300&markers=${cleanLat},${cleanLon},red-pushpin`
             : undefined;
 
-        console.log('lat:', lat, 'lon:', lon, 'mapUrl:', mapUrl);
+        console.log('lat:', cleanLat, 'lon:', cleanLon, 'mapUrl:', mapUrl);
 
         const embed = new EmbedBuilder()
             .setTitle('直近の地震情報（気象庁）')
             .setDescription(
                 `発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`
             )
-            .setColor(0xff9900)
-        if (mapUrl) embed.setImage(mapUrl)
+            .setColor(0xff9900);
+        if (mapUrl) embed.setImage(mapUrl);
 
         await interaction.editReply({ embeds: [embed] })
     } catch (e) {
