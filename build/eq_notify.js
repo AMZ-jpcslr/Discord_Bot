@@ -45,11 +45,12 @@ function startEqAutoNotify(client) {
             if (!list.length)
                 return;
             const latestId = (_a = list[0]) === null || _a === void 0 ? void 0 : _a.json;
-            if (!latestId)
-                return; // ← 追加
+            if (!latestId || typeof latestId !== 'string' || !latestId.endsWith('.json')) {
+                console.warn('不正なlatestId:', latestId);
+                return;
+            }
             if (latestId === loadLatestId())
                 return; // すでに通知済み
-            // 詳細取得
             const detailUrl = `https://www.jma.go.jp/bosai/quake/data/${latestId}`;
             console.log('地震詳細取得URL:', detailUrl);
             const detailRes = yield (0, undici_1.fetch)(detailUrl);

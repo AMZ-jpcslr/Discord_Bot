@@ -29,15 +29,17 @@ export function startEqAutoNotify(client: Client) {
             const res = await fetch('https://www.jma.go.jp/bosai/quake/data/list.json')
             const list = await res.json() as { json: string }[]
             if (!list.length) return
-            const latestId = list[0]?.json
-if (!latestId) return // ← 追加
-            if (latestId === loadLatestId()) return // すでに通知済み
+            const latestId = list[0]?.json;
+if (!latestId || typeof latestId !== 'string' || !latestId.endsWith('.json')) {
+    console.warn('不正なlatestId:', latestId);
+    return;
+}
+if (latestId === loadLatestId()) return; // すでに通知済み
 
-            // 詳細取得
-            const detailUrl = `https://www.jma.go.jp/bosai/quake/data/${latestId}`
-            console.log('地震詳細取得URL:', detailUrl)
-            const detailRes = await fetch(detailUrl)
-            const detail = await detailRes.json() as any; // ← 型アサーションを追加
+const detailUrl = `https://www.jma.go.jp/bosai/quake/data/${latestId}`;
+console.log('地震詳細取得URL:', detailUrl);
+const detailRes = await fetch(detailUrl);
+const detail = await detailRes.json() as any; // ← 型アサーションを追加
 
             // 必要な情報を抽出
             const time = detail.Head?.ReportDateTime ?? '不明'
