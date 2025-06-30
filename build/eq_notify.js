@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.startEqAutoNotify = startEqAutoNotify;
 const discord_js_1 = require("discord.js");
-const undici_1 = require("undici");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const DATA_PATH = path_1.default.join(__dirname, '../../data/eq_channels.json');
@@ -40,7 +39,7 @@ function startEqAutoNotify(client) {
     setInterval(() => __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
         try {
-            const res = yield (0, undici_1.fetch)('https://www.jma.go.jp/bosai/quake/data/list.json');
+            const res = yield fetch('https://www.jma.go.jp/bosai/quake/data/list.json');
             const list = yield res.json();
             if (!list.length)
                 return;
@@ -65,7 +64,7 @@ function startEqAutoNotify(client) {
                 return;
             }
             console.log('地震詳細取得URL:', detailUrl);
-            const detailRes = yield (0, undici_1.fetch)(detailUrl);
+            const detailRes = yield fetch(detailUrl);
             const detail = yield detailRes.json();
             // 必要な情報を抽出
             const time = (_c = (_b = detail.Head) === null || _b === void 0 ? void 0 : _b.ReportDateTime) !== null && _c !== void 0 ? _c : '不明';

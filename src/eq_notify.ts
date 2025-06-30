@@ -1,5 +1,4 @@
 import { Client, TextChannel, EmbedBuilder } from 'discord.js'
-import { fetch } from 'undici'
 import fs from 'fs'
 import path from 'path'
 
