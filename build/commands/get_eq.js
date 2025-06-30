@@ -36,8 +36,9 @@ function execute(interaction) {
             const lat = (_s = (_r = (_q = detail.Body) === null || _q === void 0 ? void 0 : _q.Earthquake) === null || _r === void 0 ? void 0 : _r.Hypocenter) === null || _s === void 0 ? void 0 : _s.Latitude;
             const lon = (_v = (_u = (_t = detail.Body) === null || _t === void 0 ? void 0 : _t.Earthquake) === null || _u === void 0 ? void 0 : _u.Hypocenter) === null || _v === void 0 ? void 0 : _v.Longitude;
             const mapUrl = (lat && lon)
-                ? `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=6&size=450,300&l=map&pt=${lon},${lat},pm2rdm`
+                ? `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=6&size=450x300&markers=${lat},${lon},red-pushpin`
                 : undefined;
+            console.log('lat:', lat, 'lon:', lon, 'mapUrl:', mapUrl);
             const embed = new discord_js_1.EmbedBuilder()
                 .setTitle('直近の地震情報（気象庁）')
                 .setDescription(`発生時刻: ${time}\n震源地: ${hypocenter}\nマグニチュード: ${magnitude}\n最大震度: ${maxScale}`)

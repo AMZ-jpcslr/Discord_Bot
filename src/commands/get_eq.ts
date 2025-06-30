@@ -24,8 +24,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         const lat = detail.Body?.Earthquake?.Hypocenter?.Latitude
         const lon = detail.Body?.Earthquake?.Hypocenter?.Longitude
         const mapUrl = (lat && lon)
-            ? `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=6&size=450,300&l=map&pt=${lon},${lat},pm2rdm`
-            : undefined
+            ? `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=6&size=450x300&markers=${lat},${lon},red-pushpin`
+            : undefined;
+
+        console.log('lat:', lat, 'lon:', lon, 'mapUrl:', mapUrl);
 
         const embed = new EmbedBuilder()
             .setTitle('直近の地震情報（気象庁）')
